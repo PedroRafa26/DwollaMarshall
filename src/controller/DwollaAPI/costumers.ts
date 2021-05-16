@@ -3,12 +3,12 @@ import { response } from "express";
 import dwolla from "../../dwollaAdmin/dwollaAdmin";
 import ApiError from "../../errors/ApiError";
 import { DwollaCreateBusinessWithController, DwollaCreateBusinessWithoutController, DwollaCreatePersonalCostumer, DwollaCreateReceiveOnlyCostumer } from "../../models/dwollaCostumer";
-import ApiResponse from "../responses";
+import ApiResponse, { InternalCodes } from "../responses";
 
 class DwollaCostumersAPI {
   constructor() { }
 
-  async createReceiveOnlyCostumer(costumer: DwollaCreateReceiveOnlyCostumer): Promise<Number> {
+  async createReceiveOnlyCostumer(costumer: DwollaCreateReceiveOnlyCostumer): Promise<number> {
     try {
 
       const createRequest = (costumer.businessName !== '')
@@ -26,12 +26,13 @@ class DwollaCostumersAPI {
       return response.status;
 
     } catch (error) {
-      // console.log(error)
-      throw ApiError.internal(ApiResponse.internal("There was an error in costumer's creation"))
+      const errorDetails = handleErrorResponse(error);
+      const {status, info, detailInfo, numberStatus} = errorDetails
+      throw ApiError.fromDwollaAPI(numberStatus, ApiResponse.fromDwollaAPI(info, status, detailInfo))
     }
   }
 
-  async createPersonalCostumer(costumer: DwollaCreatePersonalCostumer) {
+  async createPersonalCostumer(costumer: DwollaCreatePersonalCostumer) : Promise<number> {
     try {
       const createRequest = {
         ...costumer,
@@ -43,12 +44,13 @@ class DwollaCostumersAPI {
       return response.status;
 
     } catch (error) {
-      // console.log(error)
-      throw ApiError.internal(ApiResponse.internal("There was an error in costumer's creation"))
+      const errorDetails = handleErrorResponse(error);
+      const {status, info, detailInfo, numberStatus} = errorDetails
+      throw ApiError.fromDwollaAPI(numberStatus, ApiResponse.fromDwollaAPI(info, status, detailInfo))
     }
   }
 
-  async createBusinessCostumerWithoutController(costumer: DwollaCreateBusinessWithoutController){
+  async createBusinessCostumerWithoutController(costumer: DwollaCreateBusinessWithoutController) : Promise<number>{
     try {
       const createRequest = {
         ...costumer,
@@ -60,12 +62,13 @@ class DwollaCostumersAPI {
       return response.status;
 
     } catch (error) {
-      // console.log(error)
-      throw ApiError.internal(ApiResponse.internal("There was an error in costumer's creation"))
+      const errorDetails = handleErrorResponse(error);
+      const {status, info, detailInfo, numberStatus} = errorDetails
+      throw ApiError.fromDwollaAPI(numberStatus, ApiResponse.fromDwollaAPI(info, status, detailInfo))
     }
   }
-  
-  async createBusinessCostumerWithController(costumer: DwollaCreateBusinessWithController){
+
+  async createBusinessCostumerWithController(costumer: DwollaCreateBusinessWithController) : Promise<number>{
     try {
       const createRequest = {
         ...costumer,
@@ -77,20 +80,38 @@ class DwollaCostumersAPI {
       return response.status;
 
     } catch (error) {
-      // console.log(error)
-      throw ApiError.internal(ApiResponse.internal("There was an error in costumer's creation"))
+      const errorDetails = handleErrorResponse(error);
+      const {status, info, detailInfo, numberStatus} = errorDetails
+      throw ApiError.fromDwollaAPI(numberStatus, ApiResponse.fromDwollaAPI(info, status, detailInfo))
     }
   }
 
-  async consultCostumerStatus(id: String):Promise<String>{
+  async consultCostumerStatus(id: String): Promise<String> {
     try {
-      const response:Response = await dwolla.get(`https://api-sandbox.dwolla.com/customers/${id}`)
+      const response: Response = await dwolla.get(`https://api-sandbox.dwolla.com/customers/${id}`)
       const status: String = response.body.status
       return status
     } catch (error) {
-      throw ApiError.internal(ApiResponse.internal("There was an error in costumer's creation"))
+      const errorDetails = handleErrorResponse(error);
+      const {status, info, detailInfo, numberStatus} = errorDetails
+      throw ApiError.fromDwollaAPI(numberStatus, ApiResponse.fromDwollaAPI(info, status, detailInfo))
     }
   }
 }
 
 export default new DwollaCostumersAPI()
+
+const handleErrorResponse = (error: any): {status:InternalCodes, numberStatus: number, info: string, detailInfo: string } => {
+  const status : InternalCodes = error.status.toString()
+  const numberStatus: number = error.status
+  const jsonError = JSON.parse(error.message)
+  const info:string = jsonError._embedded.errors[0].code
+  const detailInfo:string = jsonError._embedded.errors[0].message
+  // console.log(error)
+  return {
+    status,
+    numberStatus,
+    info,
+    detailInfo,
+  }
+}

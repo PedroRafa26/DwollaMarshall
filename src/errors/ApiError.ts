@@ -1,6 +1,6 @@
-import { ServerResponse } from '../models/serverResponse';
+import { InternalResponses } from '../controller/responses';
 
-type errorAPI = string | ServerResponse;
+type errorAPI = string | InternalResponses;
 
 /**
  * Class for hadling API error from saldo rapido's server.
@@ -45,6 +45,9 @@ class ApiError {
 
   static notFound(msg: errorAPI) {
     return new ApiError(404, msg);
+  }
+  static fromDwollaAPI(code: number, msg: errorAPI) {
+    return new ApiError(code, msg)
   }
 }
 

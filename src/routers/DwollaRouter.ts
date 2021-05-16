@@ -13,15 +13,11 @@ app.post('/createReceiveOnlyCostumer', async (req: Request, res: Response, next:
 
 		if (!firstName || !lastName || !email) throw ApiError.badRequest(ApiResponse.badRequest('Basic information such as Last Name, First Name or Email is missing'))
 		const newCostumer: DwollaCreateReceiveOnlyCostumer = {
-			email: email,
-			firstName: firstName,
-			lastName: lastName,
-			businessName: businessName ?? '',
-			ipAddress: ipAddress ?? '',
+			...req.body
 		}
-		const response = await dwollaCostumersAPI.createReceiveOnlyCostumer(newCostumer)
+		const response: number = await dwollaCostumersAPI.createReceiveOnlyCostumer(newCostumer)
 
-		res.status(200).json({ "msg": "Costumer Created" })
+		res.status(response).json({ "msg": "Costumer Created" })
 	} catch (error) {
 		// console.log(error)
 		next(error)
@@ -38,9 +34,9 @@ app.post('/createPersonalCostumer', async (req: Request, res: Response, next: Ne
 		const newCostumer: DwollaCreatePersonalCostumer = {
 			...req.body
 		}
-		const response = await dwollaCostumersAPI.createPersonalCostumer(newCostumer)
+		const response :number = await dwollaCostumersAPI.createPersonalCostumer(newCostumer)
 
-		res.status(200).json({ "msg": "Costumer Created" })
+		res.status(response).json({ "msg": "Costumer Created" })
 	} catch (error) {
 		// console.log(error)
 		next(error)
@@ -58,9 +54,9 @@ app.post('/createBusinessCostumerWithoutController', async (req: Request, res: R
 		const newCostumer: DwollaCreateBusinessWithoutController = {
 			...req.body
 		}
-		const response = await dwollaCostumersAPI.createBusinessCostumerWithoutController(newCostumer)
+		const response : number = await dwollaCostumersAPI.createBusinessCostumerWithoutController(newCostumer)
 
-		res.status(200).json({ "msg": "Costumer Created" })
+		res.status(response).json({ "msg": "Costumer Created" })
 	} catch (error) {
 		// console.log(error)
 		next(error)
@@ -78,9 +74,9 @@ app.post('/createBusinessCostumerWithController', async (req: Request, res: Resp
 		const newCostumer: DwollaCreateBusinessWithController = {
 			...req.body
 		}
-		const response = await dwollaCostumersAPI.createBusinessCostumerWithController(newCostumer)
+		const response :number = await dwollaCostumersAPI.createBusinessCostumerWithController(newCostumer)
 
-		res.status(200).json({ "msg": "Costumer Created" })
+		res.status(response).json({ "msg": "Costumer Created" })
 	} catch (error) {
 		// console.log(error)
 		next(error)
