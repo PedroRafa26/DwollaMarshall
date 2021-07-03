@@ -1,7 +1,7 @@
 import { Response } from "dwolla-v2";
-import { response } from "express";
 import dwolla from "../../dwollaAdmin/dwollaAdmin";
 import ApiError from "../../errors/ApiError";
+import { handleErrorResponse } from "../../handlers/dwollaUtils";
 import { DwollaCreateBusinessWithController, DwollaCreateBusinessWithoutController, DwollaCreatePersonalCostumer, DwollaCreateReceiveOnlyCostumer } from "../../models/dwollaCostumer";
 import ApiResponse, { InternalCodes } from "../responses";
 
@@ -88,7 +88,7 @@ class DwollaCostumersAPI {
 
   async consultCostumerStatus(id: String): Promise<String> {
     try {
-      const response: Response = await dwolla.get(`https://api-sandbox.dwolla.com/customers/${id}`)
+      const response: Response = await dwolla.get(`/customers/${id}`)
       const status: String = response.body.status
       return status
     } catch (error) {
@@ -101,17 +101,3 @@ class DwollaCostumersAPI {
 
 export default new DwollaCostumersAPI()
 
-const handleErrorResponse = (error: any): {status:InternalCodes, numberStatus: number, info: string, detailInfo: string } => {
-  const status : InternalCodes = error.status.toString()
-  const numberStatus: number = error.status
-  const jsonError = JSON.parse(error.message)
-  const info:string = jsonError._embedded.errors[0].code
-  const detailInfo:string = jsonError._embedded.errors[0].message
-  // console.log(error)
-  return {
-    status,
-    numberStatus,
-    info,
-    detailInfo,
-  }
-}
